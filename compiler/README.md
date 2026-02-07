@@ -1,6 +1,6 @@
-# S Language ("S")
+# S Compiler (SCC)
 
-A small C-like language with its own compiler front-end and bytecode VM. The compiler parses S source into bytecode, and the VM executes it.
+A Compiler for S
 
 ## Bootstrap Build (one-time)
 
@@ -82,6 +82,3 @@ int main() {
 ```
 
 ## You can use Pre-Compiled binaries!
-
-### OKSOP
-#### OXOP
