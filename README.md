@@ -30,19 +30,19 @@ clang++ -std=c++17 -O2 -o scc.exe src/main.cpp
 ## Compile
 
 ```powershell
-.\scc.exe path/to/your/file -o hello.exe
+.\scc.exe path/to/your/file.s -o hello.exe
 .\hello.exe
 ```
 
 ```powershell
-.\scc.exe path/to/your/file -o hello_x86.exe --arch x86
+.\scc.exe path/to/your/file.s -o hello_x86.exe --arch x86
 .\hello_x86.exe
 ```
 
 ## Run (interpreter mode)
 
 ```powershell
-.\scc.exe --run examples\hello.s
+.\scc.exe --run path/to/your/file.s
 ```
 
 ## Language Summary
