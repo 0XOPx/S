@@ -12,6 +12,7 @@ copy /y src\runtime.cpp ..\runtime\runtime.cpp >nul
 clang++ -std=c++17 -O2 -o tools\embed_runtimes.exe tools\embed_runtimes.cpp || exit /b 1
 tools\embed_runtimes.exe ..\runtime\runtime_x64.exe ..\runtime\runtime_x86.exe src\embedded_runtime_x64.h src\embedded_runtime_x86.h || exit /b 1
 clang++ -std=c++17 -O2 -o scc.exe src\main.cpp || exit /b 1
+del /q runtime_x64.exe runtime_x86.exe 2>nul
 cd /d .. || exit /b 1
 clang++ -std=c++17 -O2 -o repl.exe repl\repl.cpp || exit /b 1
 
