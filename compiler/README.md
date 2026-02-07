@@ -10,15 +10,15 @@ To keep a single compiler exe with no runtime files, the runtimes are embedded a
 1) Build the runtime templates once:
 
 ```powershell
-clang++ -std=c++17 -O2 -o runtime_x64.exe src/runtime.cpp
-clang++ -std=c++17 -O2 -m32 -o runtime_x86.exe src/runtime.cpp
+clang++ -std=c++17 -O2 -o runtime_x64.exe ..\runtime\runtime.cpp
+clang++ -std=c++17 -O2 -m32 -o runtime_x86.exe ..\runtime\runtime.cpp
 ```
 
 2) Generate embedded headers:
 
 ```powershell
 clang++ -std=c++17 -O2 -o tools\\embed_runtimes.exe tools\\embed_runtimes.cpp
-.\tools\\embed_runtimes.exe runtime_x64.exe runtime_x86.exe src\\embedded_runtime_x64.h src\\embedded_runtime_x86.h
+.\tools\\embed_runtimes.exe ..\runtime\runtime_x64.exe ..\runtime\runtime_x86.exe src\\embedded_runtime_x64.h src\\embedded_runtime_x86.h
 ```
 
 3) Build the compiler:
