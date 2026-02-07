@@ -8,6 +8,7 @@ if not exist "dist" mkdir dist
 cd /d "%~dp0compiler" || exit /b 1
 clang++ -std=c++17 -O2 -o ..\runtime\runtime_x64.exe src\runtime.cpp || exit /b 1
 clang++ -std=c++17 -O2 -m32 -o ..\runtime\runtime_x86.exe src\runtime.cpp || exit /b 1
+copy /y src\runtime.cpp ..\runtime\runtime.cpp >nul
 clang++ -std=c++17 -O2 -o tools\embed_runtimes.exe tools\embed_runtimes.cpp || exit /b 1
 tools\embed_runtimes.exe ..\runtime\runtime_x64.exe ..\runtime\runtime_x86.exe src\embedded_runtime_x64.h src\embedded_runtime_x86.h || exit /b 1
 clang++ -std=c++17 -O2 -o scc.exe src\main.cpp || exit /b 1
