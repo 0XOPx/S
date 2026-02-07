@@ -845,9 +845,9 @@ string detectSystemArch() {
 int main(int argc, char** argv) {
     try {
         if (argc < 2) {
-            cerr << "Usage: sccx64 <file.s> -o <out.exe>\n";
-            cerr << "   or: sccx86 <file.s> -o <out.exe>\n";
-            cerr << "   or: sccx64 --run <file.s>\n";
+            cerr << "Usage: scc <file.s> -o <out.exe> --arch x64\n";
+            cerr << "   or: scc <file.s> -o <out.exe>--arch x64\n";
+            cerr << "   or: scc --run <file.s>\n";
             return 1;
         }
 
