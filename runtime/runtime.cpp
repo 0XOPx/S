@@ -1,6 +1,5 @@
 #include <cstdint>
 #include <cstring>
-#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -46,16 +45,7 @@ struct Frame {
     vector<int> locals;
 };
 
-static const char kMagic[8] = {'S','B','C','0','M','A','G','0'};
 static const uint32_t kVersion = 1;
-
-string getSelfPath(char** argv) {
-    char buf[MAX_PATH];
-    DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
-    if (len > 0 && len < MAX_PATH) return string(buf, len);
-    if (argv && argv[0]) return string(argv[0]);
-    return string();
-}
 
 uint32_t readU32(const vector<uint8_t>& data, size_t& pos) {
     if (pos + 4 > data.size()) throw runtime_error("Unexpected end of payload");
@@ -179,32 +169,15 @@ int runVM(const vector<Function>& functions, const vector<string>& strings, int 
 
 int main(int argc, char** argv) {
     try {
-        string path = getSelfPath(argv);
-        if (path.empty()) throw runtime_error("Cannot determine exe path");
-
-        ifstream in(path, ios::binary);
-        if (!in) throw runtime_error("Failed to open self exe");
-
-        in.seekg(0, ios::end);
-        int64_t size = static_cast<int64_t>(in.tellg());
-        if (size < 12) throw runtime_error("Exe too small");
-
-        in.seekg(size - 12, ios::beg);
-        uint32_t payloadSize = 0;
-        in.read(reinterpret_cast<char*>(&payloadSize), sizeof(uint32_t));
-        char magic[8] = {0};
-        in.read(magic, sizeof(magic));
-        if (memcmp(magic, kMagic, sizeof(kMagic)) != 0) {
-            throw runtime_error("Missing S payload");
-        }
-        if (payloadSize > static_cast<uint32_t>(size - 12)) {
-            throw runtime_error("Invalid payload size");
-        }
-
-        int64_t payloadStart = size - 12 - payloadSize;
-        in.seekg(payloadStart, ios::beg);
-        vector<uint8_t> payload(payloadSize);
-        if (payloadSize > 0) in.read(reinterpret_cast<char*>(payload.data()), payloadSize);
+        HRSRC res = FindResourceA(NULL, MAKEINTRESOURCEA(101), RT_RCDATA);
+        if (!res) throw runtime_error("Missing payload resource");
+        HGLOBAL hRes = LoadResource(NULL, res);
+        if (!hRes) throw runtime_error("LoadResource failed");
+        DWORD size = SizeofResource(NULL, res);
+        if (size < 8) throw runtime_error("Payload too small");
+        void* data = LockResource(hRes);
+        if (!data) throw runtime_error("LockResource failed");
+        vector<uint8_t> payload(reinterpret_cast<uint8_t*>(data), reinterpret_cast<uint8_t*>(data) + size);
 
         size_t pos = 0;
         uint32_t version = readU32(payload, pos);

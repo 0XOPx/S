@@ -761,7 +761,6 @@ int runVM(const Program& program, int entryFunc) {
     }
 }
 
-static const char kMagic[8] = {'S','B','C','0','M','A','G','0'};
 static const uint32_t kVersion = 1;
 
 void appendU32(vector<uint8_t>& out, uint32_t v) {
@@ -810,11 +809,24 @@ void writeExeWithPayload(const vector<uint8_t>& base, const string& outExe, cons
     if (!out) throw runtime_error("Failed to create " + outExe);
 
     if (!base.empty()) out.write(reinterpret_cast<const char*>(base.data()), base.size());
-    if (!payload.empty()) out.write(reinterpret_cast<const char*>(payload.data()), payload.size());
-
-    uint32_t size = static_cast<uint32_t>(payload.size());
-    out.write(reinterpret_cast<const char*>(&size), sizeof(uint32_t));
-    out.write(kMagic, sizeof(kMagic));
+#ifdef _WIN32
+    out.close();
+    if (!out) throw runtime_error("Failed to write " + outExe);
+    HANDLE h = BeginUpdateResourceA(outExe.c_str(), FALSE);
+    if (!h) throw runtime_error("BeginUpdateResource failed");
+    WORD lang = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL);
+    if (!UpdateResourceA(h, RT_RCDATA, MAKEINTRESOURCEA(101), lang,
+                         (void*)payload.data(), static_cast<DWORD>(payload.size()))) {
+        EndUpdateResourceA(h, TRUE);
+        throw runtime_error("UpdateResource failed");
+    }
+    if (!EndUpdateResourceA(h, FALSE)) {
+        throw runtime_error("EndUpdateResource failed");
+    }
+#else
+    (void)payload;
+    throw runtime_error("Resource embedding is only supported on Windows");
+#endif
 }
 
 vector<uint8_t> runtimeBytesForArch(const string& arch) {
