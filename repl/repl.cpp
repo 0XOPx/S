@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
             string tmp = (filesystem::path(exeDir) / "__repl_tmp.s").string();
             writeTempProgram(tmp, line);
 
-            string cmd = "\"" + compiler + "\" --run \"" + tmp + "\"";
+            string cmd = "cmd /c \"\"" + compiler + "\" --run \"" + tmp + "\"\"";
             int rc = system(cmd.c_str());
             if (rc != 0) {
                 cout << "(error)\n";
